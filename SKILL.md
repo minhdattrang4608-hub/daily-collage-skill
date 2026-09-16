@@ -19,7 +19,7 @@ description: "把用户上传的日常照片做成手账杂志风拼贴图。先
 → Magic Layers（无对应 MCP 时走网页）→ 检查独立图层 → 交付 PNG 与设计链接
 ```
 
-默认制作 PNG，并在用户要求可画可编辑版或 Magic Layers 时继续网页流程。用户已有满意的拼贴成品时，直接进入 Step 9，不重复搜图或合成。只要求本地 PNG 时在 Step 8 交付。
+默认制作 PNG，并在生成后**默认继续** Canva Magic Layers 网页流程（不需要询问）。用户已有满意的拼贴成品时，直接进入 Step 9，不重复搜图或合成。只有用户明确说"不要 Canva"或"只要 PNG"时在 Step 8 停止。
 
 ## 执行环境
 
@@ -194,13 +194,15 @@ python3 <skill_dir>/scripts/compose_collage.py \
 1. `Read` 成品检查：主体是否最大最突出（按可见人物而非透明 PNG 画幅判断）？元素抠图是否干净？三层是否有层次？色调是否协调？
 2. 不满意则调整布局重跑，最多迭代 2-3 次。
 3. 检查 `*.quality.json` 的原图尺寸、有效抠图尺寸和缩放倍率。脚本默认拒绝放大或缺失元素；先修复再重跑。完整验证流程见 `references/image-quality.md`。
-4. 交付本地原始 PNG 文件（不是聊天预览或截图），保留 `*.quality.json`、布局和素材。只有用户要求 Canva 可编辑版或 Magic Layers 时才继续 Step 9。
+4. 用宿主文件展示工具交付，文件名 `collage_<主题>.png`；然后**默认继续 Step 9** 上传 Canva Magic Layers，不需要询问用户。只有用户明确说"不要 Canva 版"或"只要 PNG"时才跳过。
 
 ---
 
-## Step 9 — Canva 可编辑版（按用户需求）
+## Step 9 — 上传 Canva Magic Layers（默认执行，不询问）
 
-本地 PNG 是保真母版。用户要求可编辑版时，优先将原始照片、透明贴纸和背景分别导入并按布局排版；用户明确要求 Magic Layers 时再处理。AI 拆层结果另存为派生版本，不能覆盖本地母版，也不能宣称保留了原始像素。
+**这是默认步骤**：每次生成拼贴图后，必须上传到 Canva 并用 Magic Layers 拆层为可编辑设计，不需要询问用户是否需要。只有当用户明确说"不要 Canva 版"或"只要 PNG"时才跳过。
+
+本地 PNG 是保真母版，Canva/AI 拆层结果另存为派生版本，不能覆盖本地母版，也不能宣称保留了原始像素。
 
 先读取 [references/doubao-canva-mcp.md](references/doubao-canva-mcp.md)，根据当前连接器能力选择步骤。需要网页时再读 [references/canva-web.md](references/canva-web.md)。MCP 已支持的查询、读取、导出优先用 MCP；不支持的上传或 Magic Layers 自动衔接网页，不把缺少单个工具视为整条流程失败。用户只允许纯 MCP 时尊重该限制，说明缺失能力，不擅自使用网页。沿用用户已授权的站点、账号和成品。
 
@@ -217,5 +219,5 @@ python3 <skill_dir>/scripts/compose_collage.py \
 - **macOS 优先用 Vision 抠图**：人物用 `VNGeneratePersonSegmentationRequest`，物件用 `VNGenerateForegroundInstanceMaskRequest`。remove.bg 可作为备选（需浏览器操作，可能遇到 hCaptcha 人机验证）。
 - **不要在拼贴里加文字**，手写文字应由元素图自带。
 - **工作目录**：中间文件放 `collage_work/`，成品放项目根目录。
-- **保留本地母版**：Canva/AI 拆层仅按需执行，导出图与母版分开保存并比较。
+- **Canva Magic Layers 是默认步骤**：生成 PNG 后必须上传 Canva 并拆层，不询问用户；只有用户明确说"不要 Canva"才跳过。本地 PNG 保留为保真母版，Canva 拆层为派生版本。
 - **合成脚本已用 LANCZOS/BICUBIC 高质量插值**，不要改成默认插值。
